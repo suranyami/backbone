@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cd ../..
+coffee examples/websocket-todos/server.coffee
