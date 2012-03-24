@@ -7,6 +7,7 @@ port = 8888
 http.createServer((request, response) ->
   uri = url.parse(request.url).pathname
   filename = path.join(process.cwd(), uri)
+  
   path.exists filename, (exists) ->
     unless exists
       response.writeHead 404,
@@ -15,7 +16,9 @@ http.createServer((request, response) ->
       response.write "404 Not Found\n"
       response.end()
       return
+    
     filename += "/index.html"  if fs.statSync(filename).isDirectory()
+    
     fs.readFile filename, "binary", (err, file) ->
       if err
         response.writeHead 500,
@@ -31,9 +34,7 @@ http.createServer((request, response) ->
 
 console.log "Static file server running at\n  => http://localhost: #{port} /\nCTRL + C to shutdown"
 
-io = require("socket.io").listen(4000,
-  origins: "*:*"
-)
+io = require("socket.io").listen(4000, {origins: "*:*"})
 
 io.set "origins", "*:*"
 io.set "log level", 1
@@ -42,8 +43,7 @@ create = (socket, signature) ->
   e = event("create", signature)
   data = []
   
-  socket.emit e,
-    id: 1
+  socket.emit e, {id: 1}
   
   console.log "created"
 
@@ -58,8 +58,7 @@ update = (socket, signature) ->
   e = event("update", signature)
   data = []
   
-  socket.emit e,
-    success: true
+  socket.emit e, {success: true}
 
   console.log "update"
 
@@ -67,8 +66,7 @@ destroy = (socket, signature) ->
   e = event("delete", signature)
   data = []
   
-  socket.emit e,
-    success: true
+  socket.emit e, {success: true}
 
   console.log "destroy"
 
