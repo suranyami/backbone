@@ -52,8 +52,8 @@ io.set "log level", 1
 
 create = (socket, data) ->
   e = event("create", data.signature)
-  console.log Todo
-  todo = new Todo(data)
+  todo = new Todo(data.item)
+  console.log todo
   todo.save ->
     socket.emit e, {id: todo.objectId}
     console.log "created"
