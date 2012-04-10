@@ -35,17 +35,28 @@ http.createServer((request, response) ->
 console.log "Static file server running at\n  => http://localhost: #{port} /\nCTRL + C to shutdown"
 
 io = require("socket.io").listen(4000, {origins: "*:*"})
+mongoose = require 'mongoose'
+
+TodoSchema = new mongoose.Schema(
+  title: String
+  order: Number
+  done: Boolean
+)
+
+Todo = mongoose.model 'Todo', TodoSchema
+
+mongoose.connect 'mongodb://localhost/todos'
 
 io.set "origins", "*:*"
 io.set "log level", 1
 
-create = (socket, signature) ->
-  e = event("create", signature)
-  data = []
-  
-  socket.emit e, {id: 1}
-  
-  console.log "created"
+create = (socket, data) ->
+  e = event("create", data.signature)
+  console.log Todo
+  todo = new Todo(data)
+  todo.save ->
+    socket.emit e, {id: todo.objectId}
+    console.log "created"
 
 read = (socket, signature) ->
   e = event("read", signature)
@@ -59,7 +70,6 @@ update = (socket, signature) ->
   data = []
   
   socket.emit e, {success: true}
-
   console.log "update"
 
 destroy = (socket, signature) ->
@@ -71,17 +81,20 @@ destroy = (socket, signature) ->
   console.log "destroy"
 
 event = (operation, sig) ->
-  "#{operation}: #{sig.endPoint}#{(":" + sig.ctx)  if sig.ctx}"
+  e = operation + ':'
+  e += sig.endPoint
+  e += (':' + sig.ctx) if (sig.ctx)
+  e   
 
 io.sockets.on "connection", (socket) ->
   socket.on "create", (data) ->
-    create socket, data.signature
+    create socket, data
 
   socket.on "read", (data) ->
-    read socket, data.signature
+    read socket, data
 
   socket.on "update", (data) ->
-    update socket, data.signature
+    update socket, data
 
   socket.on "delete", (data) ->
-    destroy socket, data.signature
+    destroy socket, data
