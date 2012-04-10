@@ -1,3 +1,27 @@
+Notes on my fork of Backbone:
+=============================
+Added a backbone-websockets persistence layer.
+It's early days and VERY unfinished.
+The test websocket server requires MongoDB to run.
+
+Trying it out
+-------------
+
+Run this:
+
+    examples/websocket-todos/run_server
+
+Then point your browser at:
+
+    http://localhost:8888/examples/websocket-todos/index.html
+    
+
+You should see a todo list. Add items to it and they will be persisted
+into the mongodb db `todos` in the collection `todos`.
+
+
+
+
      ____                     __      __                                                 
     /\  _`\                  /\ \    /\ \                                   __           
     \ \ \ \ \     __      ___\ \ \/'\\ \ \____    ___     ___      __      /\_\    ____  
